@@ -1,0 +1,40 @@
+import java.util.*;
+
+public class Solution {
+    public List<String> findRepeatedDnaSequences(String s) {
+        List<String> res = new ArrayList<>();
+        if (s == null || s.length() < 10) return res;
+
+        Map<Character, Integer> code = new HashMap<>();
+        code.put('A', 0);
+        code.put('C', 1);
+        code.put('G', 2);
+        code.put('T', 3);
+
+        int mask = (1 << 20) - 1; // keep lowest 20 bits
+        int hash = 0;
+        Set<Integer> seen = new HashSet<>();
+        Set<Integer> added = new HashSet<>();
+
+        for (int i = 0; i < s.length(); i++) {
+            hash = ((hash << 2) | code.get(s.charAt(i))) & mask;
+            if (i < 9) continue; // wait until we have 10 chars
+
+            if (!seen.contains(hash)) {
+                seen.add(hash);
+            } else if (!added.contains(hash)) {
+                // second time seeing it -> add substring
+                res.add(s.substring(i - 9, i + 1));
+                added.add(hash);
+            }
+        }
+        return res;
+    }
+
+    // quick test
+    public static void main(String[] args) {
+        Solution sol = new Solution();
+        String s = "AAAAACCCCCAAAAACCCCCCAAAAAGGGTTT";
+        System.out.println(sol.findRepeatedDnaSequences(s));
+    }
+}
